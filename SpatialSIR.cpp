@@ -19,8 +19,10 @@ using namespace Eigen; // objects VectorXf, MatrixXf
 double Kd(double d){
 
     double Kdist;
+    double a = 0.1;
 
-    Kdist = 1.0-d;//-d;
+    //Kdist = 1.0-d;//1.0-d;
+    Kdist = exp(-d/a) * 1/(2*M_PI*a*a);
 //    if (d<0.5){
 //        Kdist = 1.0;
 //    }else{
@@ -132,21 +134,28 @@ int main() {
         //double dist = uniformdistance(gen1);
 
         // for every susceptible k, calculate infectious pressure on that individual j as a sum_{infected i) beta K(d)
-        VectorXd infpressure = VectorXd::Zero(countSus);
-        int c=0;
+        //VectorXd infpressure = VectorXd::Zero(countSus);//if only susceptibles
+        VectorXd infpressure = VectorXd::Zero(1000);//if only susceptibles
+
+            int c=0;
         for (int k=0; k< particles.size(); k++){
-            if (get<type>(particles[k]) == 0){ // for every susceptible
+            //uncomment if only for susceptibles
+            //if (get<type>(particles[k]) == 0){ // for every susceptible
                 for (int m=0; m< particles.size();m++){ // look for infected individuals
 
                     if (get<type>(particles[m]) == 1){ // if infected, add the infectious pressure
+                        // check if it is not the same individual
+                        if (get<id>(particles[k]) != get<id>(particles[m])){
                         vdouble2 diff = get<position>(particles[k]) - get<position>(particles[m]);
                         infpressure[c] = infpressure[c] + beta*Kd(diff.norm());
+                    }
                     }
 
                 }
                 get<infpress>(particles[k]) = infpressure[c];
                 c = c+1;
-            }
+            //uncomment if only for susceptibles
+            //}
 
         }
 
@@ -210,7 +219,10 @@ int main() {
             // for each susceptible calculate it's likelihoood of being infected
             for (int p = 0;p< particles.size();p++){
                 //cout << " p " << p << endl;
-                if (get<type>(particles[p]) == 0){
+
+                // uncomment the line below if only susceptibles can be infected:
+                //if (get<type>(particles[p]) == 1}
+
                     //cout << "susc " << endl;
                     prob = prob + get<infpress>(particles[p])/infpressure.sum();
 
@@ -223,7 +235,9 @@ int main() {
 
                     }
                     prob_old = prob_old + get<infpress>(particles[p])/infpressure.sum();
-                }
+
+                // uncomment the line below if only susceptibles can be infected:
+                //}
             }
             //cout << "left " << endl;
 
@@ -237,6 +251,7 @@ int main() {
                     countInf = countInf +1;
                 }}
 
+        cout << "count Inf " << countInf << endl;
 
             // count Susceptibles
         countSus = 0;
@@ -245,6 +260,15 @@ int main() {
                 countSus = countSus +1;
             }
         }
+
+            // count Recoverd Temporal
+            countRec = 0;
+            for (int i = 0; i < particles.size(); i++) {
+                if (get<type>(particles)[i]==2){
+                    countRec = countRec +1;
+                }
+            }
+            cout << "count Rec " << countRec << endl;
 
     }
         // count Recovered
