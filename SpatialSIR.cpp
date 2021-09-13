@@ -20,7 +20,7 @@ using namespace Eigen; // objects VectorXf, MatrixXf
 double Kd(double d){
 
     double Kdist;
-    double a = 1.7; // 20m since 2km is 2 at this scale
+    double a = 2.0; // 20m since 2km is 2 at this scale
 
     Kdist = exp(-d/a) * 1/(2*M_PI*a*a);
 
@@ -32,7 +32,9 @@ double Kd(double d){
 
 int main() {
 
-    int Nsim = 1;
+
+
+    int Nsim = 10000; // 10000
     srand(time(0));
 
     bool infect_infected = false; // if infected can be infected
@@ -49,6 +51,7 @@ int main() {
 
     int N=2000;
 
+    double radius = 100; // max radius where to search for other plants
     //double beta = 0.0003;//2;//03;0.02;// it won't be used, I will calculate beta
     double mu = 0.1;
 
@@ -134,7 +137,8 @@ int main() {
         arand = (double) rand()/RAND_MAX;
         int randnr = floor (arand * double(N)); //choose a random individual
         get<type>(particles)[randnr] = 1; //assume that the first one since all the coordinates are random
-        cout << " infected position " << get<position>(particles)[randnr] << endl;
+
+        //cout << " infected position " << get<position>(particles)[randnr] << endl;
 
     }else{
         get<type>(particles)[0] = 1; //assume that the first one since all the coordinates are random
@@ -192,10 +196,9 @@ int main() {
         //while (countInf > 0){
         while (countInf > 0 && countInf+countRec < 100){
 
-        #ifdef HAVE_VTK
-                vtkWriteGrid("O5rchids", t*1000, particles.get_grid(true));
-        #endif
-
+//        #ifdef HAVE_VTK
+//                vtkWriteGrid("Orchards", t*1000, particles.get_grid(true));
+//        #endif
 
 
         double rand1,rand2;
@@ -234,20 +237,19 @@ int main() {
                 //}
             }else{
                     if (get<type>(particles[k]) == 0 ){
-                        for (int m=0; m< particles.size();m++){ // look for infected individuals
 
-                            if (get<type>(particles[m]) == 1){ // if infected, add the infectious pressure
-                                    vdouble2 diff = get<position>(particles[k]) - get<position>(particles[m]);
-                                    infpressure[c] = infpressure[c] + betanew*Kd(diff.norm());
-
-                            }
-
+                        for (auto j = euclidean_search(particles.get_query(),
+                                                       get<position>(particles)[k], radius);
+                             j != false; ++j) {
+                            if (get<type>(*j) == 1){ // if infected, add the infectious pressure
+                                vdouble2 diff = get<position>(particles[k]) - get<position>(*j);
+                                infpressure[c] = infpressure[c] + betanew*Kd(diff.norm());
+                                //}
                         }
+                        }
+//                        for (int m=0; m< particles.size();m++){ // look for infected individuals
+//                        }
                         get<infpress>(particles[k]) = infpressure[c];
-                        cout << "type " << get<type>(particles[k]) << endl;
-                        cout << "susc postition " << get<position>(particles[k]) << endl;
-                        cout << "susc infpress " << get<infpress>(particles[k]) << endl;
-
 
                         //                if ( get<type>(particles[k]) == 1){ // for checking
                         //                    cout << "inf pressure of infected " << infpressure[c] << endl;
@@ -257,8 +259,6 @@ int main() {
                 }
 
         }
-
-        cout << "infpressure.sum() " << infpressure.sum() << endl;
 
 
         t = t + 1/ (infpressure.sum() + mu * countInf) * log(1/rand1);
@@ -353,22 +353,17 @@ int main() {
 
                         //cout << "susc " << endl;
                         prob = prob + double(get<infpress>(particles[p])/infpressure.sum());
-                        cout << "posi " << get<position>(particles[p]) << endl;
-                        cout << "prob_old " << prob_old << endl;
-                        cout << "prob " << prob << endl;
-                        cout << "r " << r << endl;
+
 
                         if (prob_old < r && r <= prob){
-                            cout << "enters " << endl;
 
                             get<type>(particles[p]) = 1;
                             //                        cout << "prob_old " << prob_old << endl;
                             //                        cout << "prob" << prob << endl;
                             //                        cout << "changed" << endl;
 
-                            cout << "infected sup position " << get<position>(particles[p]) << endl;
                             break;
-                            cout << "after break " << endl;
+
                         }
                         prob_old = prob_old + get<infpress>(particles[p])/infpressure.sum();
 
@@ -422,7 +417,11 @@ int main() {
 
 //    cout << "t " << t << endl;
 
-    cout << countRec << endl;
+    if (countRec+countInf==100){
+        cout << "Infection" << countRec +countInf << endl;
+    }else{
+        cout << countRec +countInf << endl;
+    }
     }
 //
 //    ofstream output("Betavalues100plantsKdexp0p1InfInfectedFalse.csv");
