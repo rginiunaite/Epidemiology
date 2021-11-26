@@ -20,11 +20,16 @@ using namespace Eigen; // objects VectorXf, MatrixXf
 double Kd(double d){
 
     double Kdist;
-    double a = 2.0; // 20m since 2km is 2 at this scale
+    double a = 1000.0; // 20m since 2km is 2 at this scale
 
-    Kdist = exp(-d/a) * 1/(2*M_PI*a*a);
+    //Kdist = exp(-d/a) * 1/(2*M_PI*a*a);
 
     //Kdist = 1.0;
+    double p = 1.0; // p=0, 0.2,0.4,0.6,0.8,1.0
+    double a1 = 1.0;
+    double a2 = 10.0;
+
+    Kdist = p*exp(-d/a1) + (1.0-p)*exp(-d/a2);// two values.
 
 
     return Kdist;
@@ -34,11 +39,11 @@ int main() {
 
 
 
-    int Nsim = 10000; // 10000
+    int Nsim = 10000;
     srand(time(0));
 
     bool infect_infected = false; // if infected can be infected
-    bool orchards = true; // true if orcihds, false if random
+    bool orchards = false; // true if orcihds, false if random
     VectorXd betavalues = VectorXd::Zero(Nsim);//if only susceptibles
 
 
@@ -49,23 +54,27 @@ int main() {
 
     //int n_seed = 20;
 
-    int N=2000;
+    int N= 100;
 
     double radius = 100; // max radius where to search for other plants
     //double beta = 0.0003;//2;//03;0.02;// it won't be used, I will calculate beta
     double mu = 0.1;
 
-//    int length_x = 2;
-//    int length_y = 2;
+    int length_x = 100;
+    int length_y = 100;
 
-    // for orchards
+
     double rowspacing = 10.0;
     double columnspacing = 5.0;
     int columndim = 63;
     int rowdim = 32;
-    int length_x = int(rowspacing)*rowdim;
-    int length_y = int(columndim)*columndim;
+
+
     if (orchards == true){
+        // for orchards
+        length_x = int(rowspacing)*rowdim;
+        length_y = int(columnspacing)*columndim;
+
        N = columndim*rowdim; // initial number of individuals
     }
 
@@ -117,8 +126,8 @@ int main() {
     for (int i = 0; i < N; ++i) {
 
         double a,b;
-            a = (double) rand()/RAND_MAX;
-            b = (double) rand()/RAND_MAX;
+            a = (double) rand()/RAND_MAX * length_x;
+            b = (double) rand()/RAND_MAX * length_y;
 
 
         get<type>(particles[i]) = 0; // all susceptible
@@ -184,6 +193,7 @@ int main() {
 
     double betanew = R0 * mu/infpressureIn.mean();
 
+
     betavalues[sim] = betanew;
 
     //cout << "betanew " << betanew << endl;
@@ -197,7 +207,7 @@ int main() {
         while (countInf > 0 && countInf+countRec < 100){
 
 //        #ifdef HAVE_VTK
-//                vtkWriteGrid("Orchards", t*1000, particles.get_grid(true));
+//                vtkWriteGrid("CitrusLargeSizea10mu0p01t", t*1000, particles.get_grid(true));
 //        #endif
 
 
