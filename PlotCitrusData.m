@@ -1,17 +1,17 @@
 %% citrus data
 
-len = 100;
+len = 550;
 
 Orch2 = load('CitrusData/Citrusa2mu0p1N10000RI100.csv');
 Orch2 = Orch2(1:len);
 
-Orch4 = load('CitrusData/Citrusa4mu0p1N10000RI100.csv');
+Orch4 = load('CitrusData/Citrusa20mu0p1N10000RI100.csv');
 Orch4 = Orch4(1:len);
 
-Orch6 = load('CitrusData/Citrusa20mu0p1N10000RI100.csv');
+Orch6 = load('CitrusData/Citrusa100mu0p1N10000RI100.csv');
 Orch6 = Orch6(1:len);
 
-Orch8 = load('CitrusData/Citrusa200mu0p1N10000RI100.csv');
+Orch8 = load('CitrusData/Citrusa200mu0p1N10000RI100.csv'); % 
 Orch8 = Orch8(1:len);
 
 Orch10 = load('CitrusData/Citrusa2000mu0p1N10000RI100.csv');
@@ -27,13 +27,21 @@ majorEpid(5) = length(nonzeros(isinf(Orch10)))/len;
 figure
 
 a = [2,4,6,8,10];
+%a = [2 20 100 200 2000];
 scatter(a, majorEpid,50,'filled')
+xticks([2 4 6 8 10])
+xticklabels({'2','20','100','200','2000'})
 hold on
 plot(a,majorEpid,'--')
 
 
+
+
 xlabel('a values in the exponential kernel')
 ylabel('Probability')
+
+
+
 set(gca,'FontSize',36)
 ax = gca;
 grid on

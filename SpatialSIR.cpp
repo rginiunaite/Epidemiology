@@ -20,16 +20,18 @@ using namespace Eigen; // objects VectorXf, MatrixXf
 double Kd(double d){
 
     double Kdist;
-    double a = 1000.0; // 20m since 2km is 2 at this scale
+    double a = 50.0; // 20m since 2km is 2 at this scale
 
-    //Kdist = exp(-d/a) * 1/(2*M_PI*a*a);
+    Kdist = exp(-d/a) * 1/(2*M_PI*a*a);
 
     //Kdist = 1.0;
-    double p = 1.0; // p=0, 0.2,0.4,0.6,0.8,1.0
-    double a1 = 1.0;
-    double a2 = 10.0;
 
-    Kdist = p*exp(-d/a1) + (1.0-p)*exp(-d/a2);// two values.
+    // Vary p
+//    double p = 1.0; // p=0, 0.2,0.4,0.6,0.8,1.0
+//    double a1 = 2.0;
+//    double a2 = 6.0;
+//
+//    Kdist = p*exp(-d/a1) + (1.0-p)*exp(-d/a2);// two values.
 
 
     return Kdist;
@@ -54,14 +56,14 @@ int main() {
 
     //int n_seed = 20;
 
-    int N= 100;
+    int N= 2000;
 
-    double radius = 100; // max radius where to search for other plants
+    double radius = 1000; // max radius where to search for other plants
     //double beta = 0.0003;//2;//03;0.02;// it won't be used, I will calculate beta
     double mu = 0.1;
 
-    int length_x = 100;
-    int length_y = 100;
+    int length_x = 2000;
+    int length_y = 2000;
 
 
     double rowspacing = 10.0;

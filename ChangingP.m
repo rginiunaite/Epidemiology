@@ -2,22 +2,41 @@
 
 len = 10000;
 
-RandPlant0 = load('ChangingP/Changingp0p0.csv');
+% RandPlant0 = load('ChangingP/Changingp0p0.csv');
+% RandPlant0 = RandPlant0(1:len);
+% 
+% RandPlant2 = load('ChangingP/Changingp0p2.csv');
+% RandPlant2 = RandPlant2(1:len);
+% 
+% RandPlant4 = load('ChangingP/Changingp0p4.csv');
+% RandPlant4 = RandPlant4(1:len);
+% 
+% RandPlant6 = load('ChangingP/Changingp0p6.csv');
+% RandPlant6 = RandPlant6(1:len);
+% 
+% RandPlant8 = load('ChangingP/Changingp0p8.csv');
+% RandPlant8 = RandPlant8(1:len);
+% 
+% RandPlant10 = load('ChangingP/Changingp1.csv');
+% RandPlant10 = RandPlant10(1:len);
+
+
+RandPlant0 = load('ChangingP/Changinga1is2a2is6Plants200p0p0.csv');
 RandPlant0 = RandPlant0(1:len);
 
-RandPlant2 = load('ChangingP/Changingp0p2.csv');
+RandPlant2 = load('ChangingP/Changinga1is2a2is6Plants200p0p2.csv');
 RandPlant2 = RandPlant2(1:len);
 
-RandPlant4 = load('ChangingP/Changingp0p4.csv');
+RandPlant4 = load('ChangingP/Changinga1is2a2is6Plants200p0p4.csv');
 RandPlant4 = RandPlant4(1:len);
 
-RandPlant6 = load('ChangingP/Changingp0p6.csv');
+RandPlant6 = load('ChangingP/Changinga1is2a2is6Plants200p0p6.csv');
 RandPlant6 = RandPlant6(1:len);
 
-RandPlant8 = load('ChangingP/Changingp0p8.csv');
+RandPlant8 = load('ChangingP/Changinga1is2a2is6Plants200p0p8.csv');
 RandPlant8 = RandPlant8(1:len);
 
-RandPlant10 = load('ChangingP/Changingp1.csv');
+RandPlant10 = load('ChangingP/Changinga1is2a2is6Plants200p1p0.csv');
 RandPlant10 = RandPlant10(1:len);
 
 majorEpid(1) = length(nonzeros(RandPlant0>50))/len;
