@@ -46,8 +46,13 @@ int main() {
         a = 2.0 * double(co + 1);
         ofstream myfile;
 
+        bool full_size = false; // fullsize 2016 plants, around 300x300, false 100x100 200 plants
+        bool random_inf = false; // if true random individual is infected, if false centred individual is infected, only for small size
+        double lower_bound = 40.0;
+        double upper_bound = 60.0;
+
         int R0 = 2;
-        myfile.open ("OrchardsR0" +to_string(R0) + "a" + to_string(int(a)) + "plants2016.csv");
+        myfile.open ("OrchardsR0" +to_string(R0) + "a" + to_string(int(a)) + "plants200.csv");
 
         int final_count =100;
         if (a >8){
@@ -69,21 +74,50 @@ int main() {
 
             //int n_seed = 20;
 
-            int N = 2016;//0;
+            int N;// number of individuals = 2016;//0;
+
+            if (full_size==true){
+                N=2016;
+            }else{
+                N=200;
+            }
+
             double radius = a * 10;//0; // max radius where to search for other plants
 
 
             //double beta = 0.0003;//2;//03;0.02;// it won't be used, I will calculate beta
             double mu = 0.1;
 
-            int length_x = 320;// for orchards citrus 100;//
-            int length_y = 315;// for orchards citrus 100;//
+            int length_x;
+            int length_y;
+            // full size
+            if (full_size == true){
+                length_x = 320;// for orchards citrus 100;//
+                length_y = 315;// for orchards citrus 100;//
+            }else{
+                //small size
+                length_x = 100;// for orchards citrus 100;//
+                length_y = 100;// for orchards citrus 100;//
+            }
 
 
             double rowspacing = 10.0;
             double columnspacing = 5.0;
-            int columndim = 63;//63;
-            int rowdim = 32;//32;
+
+
+
+            int columndim;//63;
+            int rowdim;//32;
+
+            if (full_size == true){
+                columndim = 63;//63;
+                rowdim = 32;// for orchards citrus 100;//
+            }else{
+                //small size
+                columndim = 20;//63;
+                rowdim = 10;// for orchards citrus 100;//
+            }
+
 
 
             if (orchards == true) {
@@ -153,21 +187,31 @@ int main() {
                 }
             }
 
+            // RANDOM infection one particle infected
 
+            if (random_inf == true){
+                if (orchards == true) {
+                    double arand;
+                    arand = (double) rand() / RAND_MAX;
+                    int randnr = floor(arand * double(N)); //choose a random individual
+                    get<type>(particles)[randnr] = 1; //assume that the first one since all the coordinates are random
 
-            // one particle infected
-            if (orchards == true) {
-                double arand;
-                arand = (double) rand() / RAND_MAX;
-                int randnr = floor(arand * double(N)); //choose a random individual
-                get<type>(particles)[randnr] = 1; //assume that the first one since all the coordinates are random
+                    //cout << " infected position " << get<position>(particles)[randnr] << endl;
 
-                //cout << " infected position " << get<position>(particles)[randnr] << endl;
+                } else {
+                    get<type>(particles)[0] = 1; //assume that the first one since all the coordinates are random
+                }
+            }else{ // infection in the centre
+                for (int k = 0; k < particles.size(); k++){
+                    vdouble2 x = get<position>(particles[k]);
+                    if (x[0] < upper_bound && x[1] < upper_bound && x[0]>lower_bound && x[1]>lower_bound){
+                        get<type>(particles)[k] = 1;
+                        break;
+                    }
 
-            } else {
-                get<type>(particles)[0] = 1; //assume that the first one since all the coordinates are random
+                }
+
             }
-
 
 
 
@@ -195,6 +239,7 @@ int main() {
             VectorXd infpressureIn = VectorXd::Zero(N);//if only susceptibles
             int c = 0;
 
+
             for (int k = 0; k < particles.size(); k++) {
                 for (int m = 0; m < particles.size(); m++) { // look for infected individuals
                     if (get<id>(particles[k]) != get<id>(particles[m])) {
@@ -220,6 +265,8 @@ int main() {
             //while (countInf > 0){
             while (countInf > 0 && countInf + countRec < 100) {
 
+
+
 //        #ifdef HAVE_VTK
 //                vtkWriteGrid("CorrectData/Paraview/Orchardmu0p1ais10t", t*1000, particles.get_grid(true));
 //        #endif
@@ -240,8 +287,9 @@ int main() {
 
                 //auto start = chrono::steady_clock::now();
 
-
                 for (int k = 0; k < particles.size(); k++) {
+
+
                     //uncomment if only for susceptibles
 
                     if (infect_infected == true) {
